@@ -1,0 +1,187 @@
+#include <XBOXUSB.h>
+#include <SPI.h>
+/*
+ * NOTES:
+ * 
+ * -forward on motors is LOW
+ * 
+ */
+#ifdef dobogusinclude
+#include <spi4teensy3.h>
+#endif
+
+USB pilot;
+XBOXUSB Xbox(&pilot);
+  
+  int pwmM1 = A8;
+  int pwmM2 = A9;
+  int pwmM3 = A10;
+  int pwmM4 = A11;
+  int pwmM5 = A12;
+  int pwmM6 = A13;
+  
+  int dirM1 = 44;
+  int dirM2 = 45;
+  int dirM3 = 46;
+  int dirM4 = 47;
+  int dirM5 = 48;
+  int dirM6 = 49;
+
+void setup() 
+{
+  Serial.begin(115200);
+  
+#if !defined(__MIPSEL__)
+  while (!Serial); 
+#endif
+  if (pilot.Init() == -1) {
+    Serial.print(F("\r\nOSC did not start"));
+    while (1);
+  }
+  Serial.print(F("\r\nXBOX USB Library Started"));
+  
+  pinMode(dirM1, OUTPUT);
+  pinMode(dirM2, OUTPUT);
+  pinMode(dirM3, OUTPUT);
+  pinMode(dirM4, OUTPUT);
+  pinMode(dirM5, OUTPUT);
+  pinMode(dirM6, OUTPUT);
+
+  pinMode(pwmM1, OUTPUT);
+  pinMode(pwmM2, OUTPUT);
+  pinMode(pwmM3, OUTPUT);
+  pinMode(pwmM4, OUTPUT);
+  pinMode(pwmM5, OUTPUT);
+  pinMode(pwmM6, OUTPUT);
+
+}
+
+void loop() 
+{
+
+  pilot.Task();
+  
+  analogWrite(pwmM1, 0);
+  analogWrite(pwmM2, 0);
+  analogWrite(pwmM3, 0);
+  analogWrite(pwmM4, 0);
+  analogWrite(pwmM5, 0);
+  analogWrite(pwmM6, 0);
+
+  if (Xbox.Xbox360Connected)
+  {
+    if (Xbox.getAnalogHat(LeftHatY) < -7500)
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, LOW);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getAnalogHat(LeftHatY) > 7500)
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, HIGH);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getAnalogHat(LeftHatX) > 7500)
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, HIGH);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getAnalogHat(LeftHatX) < -7500)
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, LOW);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getButtonPress(R2))
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, LOW);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getButtonPress(L2))
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, HIGH);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getButtonPress(L1))
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM4, HIGH);
+  
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM4, 255);
+    }
+  
+    if (Xbox.getButtonPress(R1))
+    {
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+  
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+    }
+  
+    if (Xbox.getAnalogHat(RightHatY) > 7500)
+    {
+      digitalWrite(dirM5, HIGH);
+      digitalWrite(dirM6, HIGH);
+  
+      analogWrite(pwmM5, 255);
+      analogWrite(pwmM6, 255);
+    }
+  
+    if (Xbox.getAnalogHat(RightHatY) < -7500)
+    {
+      digitalWrite(dirM5, LOW);
+      digitalWrite(dirM6, LOW);
+  
+      analogWrite(pwmM5, 255);
+      analogWrite(pwmM6, 255);
+    }
+  }
+}
