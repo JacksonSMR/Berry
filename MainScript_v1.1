@@ -79,6 +79,14 @@ void loop()
   //This starts something probably
   pilot.Task();
 
+  //Reset motors to off after loop
+  analogWrite(pwmM1, 0);
+  analogWrite(pwmM2, 0);
+  analogWrite(pwmM3, 0);
+  analogWrite(pwmM4, 0);
+  analogWrite(pwmM5, 0);
+  analogWrite(pwmM6, 0);
+  
   //Here's the big boy stuff
   if(Xbox.Xbox360Connected)
   {
