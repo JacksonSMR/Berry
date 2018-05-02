@@ -1,0 +1,230 @@
+/*
+ * 
+ * This edition of genius code written by the Right Honourable Jackson S. Rigler
+ * consists of function changes to motor direction, without changing the overall
+ * motor control from sign-magnitude mode to locked anti-phase mode.  It also
+ * implements elegantly descriptive commenting, due to Jared's head being so
+ * far up his own rectum that he cannot understand what is happening.
+ * 
+ */
+
+//Libraries
+#include <XBOXUSB.h>
+#include <SPI.h>
+
+//I don't know what that does either
+#ifdef dobogusinclude
+#include <spi4teensy3.h>
+#endif
+
+//USB declarations
+USB pilot;
+XBOXUSB Xbox(&pilot);
+
+//Variable declarations
+//PWM pins
+int pwmM1 = A8;
+int pwmM2 = A9;
+int pwmM3 = A10;
+int pwmM4 = A11;
+int pwmM5 = A12;
+int pwmM6 = A13;
+
+//Digital pins
+int dirM1 = 44;
+int dirM2 = 45; 
+int dirM3 = 46;
+int dirM4 = 47;
+int dirM5 = 48;
+int dirM6 = 49;
+
+void setup() 
+{
+  //Don't mess with that baud
+  Serial.begin(115200);
+
+  //The Google said to do this
+  #if !defined(__MIPSEL__)
+     while (!Serial);
+  #endif
+
+  //If you did it wrong you get this
+  if (pilot.Init() == -1)
+  {
+    Serial.print(F("\r\nBuddy she's fucked"));
+    while (1);
+  }
+
+  //If you're the Right Honourable Jackson S. Rigler you get this
+  Serial.print(F("\r\nRight on she's steady"));
+
+  pinMode(dirM1, OUTPUT);
+  pinMode(dirM2, OUTPUT);
+  pinMode(dirM3, OUTPUT);
+  pinMode(dirM4, OUTPUT);
+  pinMode(dirM5, OUTPUT);
+  pinMode(dirM6, OUTPUT);
+
+  pinMode(pwmM1, OUTPUT);
+  pinMode(pwmM2, OUTPUT);
+  pinMode(pwmM3, OUTPUT);
+  pinMode(pwmM4, OUTPUT);
+  pinMode(pwmM5, OUTPUT);
+  pinMode(pwmM6, OUTPUT);
+
+}
+
+void loop() 
+{
+  //This starts something probably
+  pilot.Task();
+
+  //Here's the big boy stuff
+  if(Xbox.Xbox360Connected)
+  {
+    //Backwards
+    if (Xbox.getAnalogHat(LeftHatY) < -7500)
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, LOW);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Forwards
+    if (Xbox.getAnalogHat(LeftHatY) > 7500)
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, HIGH);
+      
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Left Turn
+    if (Xbox.getButtonPress(L2))
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, HIGH);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Right Turn
+    if (Xbox.getButtonPress(R2))
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, LOW);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Leftward
+    if (Xbox.getButtonClick(L1))
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+      digitalWrite(dirM4, LOW);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Rightward
+    if (Xbox.getButtonClick(R1))
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, LOW);
+      digitalWrite(dirM4, HIGH);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Diagonal Left-Up
+    if (Xbox.getButtonClick(UP) and Xbox.getButtonClick(LEFT))
+    {
+      digitalWrite(dirM2, LOW);
+      digitalWrite(dirM3, HIGH);
+
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+    }
+
+    //Diagonal Right-Up
+    if (Xbox.getButtonClick(UP) and Xbox.getButtonClick(RIGHT))
+    {
+      digitalWrite(dirM1, LOW);
+      digitalWrite(dirM4, HIGH);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Diagonal Left-Down
+    if (Xbox.getButtonClick(DOWN) and Xbox.getButtonClick(LEFT))
+    {
+      digitalWrite(dirM1, HIGH);
+      digitalWrite(dirM4, LOW);
+
+      analogWrite(pwmM1, 255);
+      analogWrite(pwmM4, 255);
+    }
+
+    //Diagonal Right-Down
+    if (Xbox.getButtonClick(DOWN) and Xbox.getButtonClick(RIGHT))
+    {
+      digitalWrite(dirM2, HIGH);
+      digitalWrite(dirM3, LOW);
+
+      analogWrite(pwmM2, 255);
+      analogWrite(pwmM3, 255);
+    }
+
+    //Up
+    if (Xbox.getAnalogHat(RightHatY) > 7500)
+    {
+      digitalWrite(dirM5, LOW);
+      digitalWrite(dirM6, LOW);
+
+      analogWrite(pwmM5, 255);
+      analogWrite(pwmM6, 255);
+    }
+
+    //Down
+    if (Xbox.getAnalogHat(RightHatY) < -7500)
+    {
+      digitalWrite(dirM5, HIGH);
+      digitalWrite(dirM6, HIGH);
+
+      analogWrite(pwmM5, 255);
+      analogWrite(pwmM6, 255);
+    }
+    
+  }
+}
