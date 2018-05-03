@@ -1,0 +1,199 @@
+/*
+ * 
+ * This edition of genius code written by the Right Honourable Jackson S. Rigler
+ * consists of motor control changes, implementing locked-anti phase mode.  It also
+ * implements elegantly descriptive commenting, due to Jared's head being so
+ * far up his own rectum that he cannot understand what is happening.
+ * 
+ */
+
+//Libraries
+#include <XBOXUSB.h>
+#include <SPI.h>
+
+//I don't know what that does either
+#ifdef dobogusinclude
+#include <spi4teensy3.h>
+#endif
+
+//USB declarations
+USB pilot;
+XBOXUSB Xbox(&pilot);
+
+//Variable declarations
+//PWM pins
+int dirM1 = A8;
+int dirM2 = A9;
+int dirM3 = A10;
+int dirM4 = A11;
+int dirM5 = A12;
+int dirM6 = A13;
+
+//Digital pins
+int pwmM1 = 44;
+int pwmM2 = 45; 
+int pwmM3 = 46;
+int pwmM4 = 47;
+int pwmM5 = 48;
+int pwmM6 = 49;
+
+void setup() 
+{
+  //Don't mess with that baud
+  Serial.begin(115200);
+
+  //The Google said to do this
+  #if !defined(__MIPSEL__)
+     while (!Serial);
+  #endif
+
+  //If you did it wrong you get this
+  if (pilot.Init() == -1)
+  {
+    Serial.print(F("\r\nBuddy she's fucked"));
+    while (1);
+  }
+
+  //If you're the Right Honourable Jackson S. Rigler you get this
+  Serial.print(F("\r\nRight on she's steady"));
+
+  pinMode(dirM1, OUTPUT);
+  pinMode(dirM2, OUTPUT);
+  pinMode(dirM3, OUTPUT);
+  pinMode(dirM4, OUTPUT);
+  pinMode(dirM5, OUTPUT);
+  pinMode(dirM6, OUTPUT);
+
+  pinMode(pwmM1, OUTPUT);
+  pinMode(pwmM2, OUTPUT);
+  pinMode(pwmM3, OUTPUT);
+  pinMode(pwmM4, OUTPUT);
+  pinMode(pwmM5, OUTPUT);
+  pinMode(pwmM6, OUTPUT);
+
+}
+
+void loop() 
+{
+  //This starts something probably
+  pilot.Task();
+
+  //Gets those motors ready for some commands
+  digitalWrite(pwmM1, HIGH);
+  digitalWrite(pwmM2, HIGH);
+  digitalWrite(pwmM3, HIGH);
+  digitalWrite(pwmM4, HIGH);
+  digitalWrite(pwmM5, HIGH);
+  digitalWrite(pwmM6, HIGH);
+
+  //Turn off motors
+  analogWrite(dirM1, 128);
+  analogWrite(dirM2, 128);
+  analogWrite(dirM3, 128);
+  analogWrite(dirM4, 128);
+  analogWrite(dirM5, 128);
+  analogWrite(dirM6, 128);
+  
+  //Here's the big boy stuff
+  if(Xbox.Xbox360Connected)
+  {
+    //Backwards
+    if (Xbox.getAnalogHat(LeftHatY) < -7500)
+    {
+      digitalWrite(dirM1, 255);
+      digitalWrite(dirM2, 255);
+      digitalWrite(dirM3, 0);
+      digitalWrite(dirM4, 0);
+    }
+
+    //Forwards
+    if (Xbox.getAnalogHat(LeftHatY) > 7500)
+    {
+      digitalWrite(dirM1, 0);
+      digitalWrite(dirM2, 0);
+      digitalWrite(dirM3, 255);
+      digitalWrite(dirM4, 255);
+    }
+
+    //Left Turn
+    if (Xbox.getButtonPress(L2))
+    {
+      digitalWrite(dirM1, 255);
+      digitalWrite(dirM2, 0);
+      digitalWrite(dirM3, 0);
+      digitalWrite(dirM4, 255);
+    }
+
+    //Right Turn
+    if (Xbox.getButtonPress(R2))
+    {
+      digitalWrite(dirM1, 0);
+      digitalWrite(dirM2, 255);
+      digitalWrite(dirM3, 255);
+      digitalWrite(dirM4, 0);
+    }
+
+    //Leftward
+    if (Xbox.getButtonClick(L1))
+    {
+      digitalWrite(dirM1, 255);
+      digitalWrite(dirM2, 0);
+      digitalWrite(dirM3, 255);
+      digitalWrite(dirM4, 0);
+    }
+
+    //Rightward
+    if (Xbox.getButtonClick(R1))
+    {
+      digitalWrite(dirM1, 0);
+      digitalWrite(dirM2, 255);
+      digitalWrite(dirM3, 0);
+      digitalWrite(dirM4, 255);
+    }
+
+    //Diagonal Left-Up
+    if (Xbox.getButtonClick(UP) and Xbox.getButtonClick(LEFT))
+    {
+      digitalWrite(dirM2, 0);
+      digitalWrite(dirM3, 255);
+    }
+
+    //Diagonal Right-Up
+    if (Xbox.getButtonClick(UP) and Xbox.getButtonClick(RIGHT))
+    {
+      digitalWrite(dirM1, 0);
+      digitalWrite(dirM4, 255);
+    }
+
+    //Diagonal Left-Down
+    if (Xbox.getButtonClick(DOWN) and Xbox.getButtonClick(LEFT))
+    {
+      digitalWrite(dirM1, 255);
+      digitalWrite(dirM4, 0);
+    }
+
+    //Diagonal Right-Down
+    if (Xbox.getButtonClick(DOWN) and Xbox.getButtonClick(RIGHT))
+    {
+      digitalWrite(dirM2, 255);
+      digitalWrite(dirM3, 0);
+    }
+
+    //Up
+    if (Xbox.getAnalogHat(RightHatY) > 7500)
+    {
+      digitalWrite(dirM5, 0);
+      digitalWrite(dirM6, 0);
+    }
+
+    //Down
+    if (Xbox.getAnalogHat(RightHatY) < -7500)
+    {
+      digitalWrite(dirM5, 255);
+      digitalWrite(dirM6, 255);
+    }
+    
+  }
+}
+
+//Yeah I don't get this one either
