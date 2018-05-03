@@ -11,6 +11,7 @@
 //Libraries
 #include <XBOXUSB.h>
 #include <SPI.h>
+#include <Servo.h>
 
 //I don't know what that does either
 #ifdef dobogusinclude
@@ -20,6 +21,10 @@
 //USB declarations
 USB pilot;
 XBOXUSB Xbox(&pilot);
+
+//Servo declarations
+Servo clawTurn;
+Servo clawGrab;
 
 //Variable declarations
 //PWM pins
@@ -37,6 +42,14 @@ int dirM3 = 46;
 int dirM4 = 47;
 int dirM5 = 48;
 int dirM6 = 49;
+
+//Servo pins
+int turnPin = 32;
+int grabPin = 33;
+
+//Servo counts
+int turn = 90;
+int grab = 90;
 
 void setup() 
 {
@@ -57,6 +70,14 @@ void setup()
 
   //If you're the Right Honourable Jackson S. Rigler you get this
   Serial.print(F("\r\nRight on she's steady"));
+
+  //Connect servos to pins
+  clawTurn.attach(turnPin);
+  clawGrab.attach(grabPin);
+
+  //Set servos
+  clawTurn.write(turn);
+  clawGrab.write(grab);
 
   pinMode(dirM1, OUTPUT);
   pinMode(dirM2, OUTPUT);
@@ -233,6 +254,34 @@ void loop()
       analogWrite(pwmM5, 255);
       analogWrite(pwmM6, 255);
     }
-    
+
+    //Servo Turn Left
+    if (Xbox.getButtonClick(X) and turn > 0)
+    {
+       turn = turn - 5;
+       clawTurn.write(turn);
+    }
+
+    //Servo Turn Right
+    if (Xbox.getButtonClick(B) and turn < 180)
+    {
+      turn = turn + 5;
+      clawTurn.write(turn);
+    }
+
+    //Servo Grab Close
+    if (Xbox.getButtonClick(A) and grab > 0)
+    {
+      grab = grab - 5;
+      clawGrab.write(grab);
+    }
+
+    //Servo Grab Open
+    if (Xbox.getButtonClick(Y) and grab < 180)
+    {
+      grab = grab + 5;
+      clawGrab.write(grab);
+    }
   }
+  delay(2);
 }
